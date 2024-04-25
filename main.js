@@ -145,8 +145,8 @@ function setup() {
 function addCurrentInput() {
     let word = inputText.value;
     if (suffixMode) {
-        words.clear();
         trie.children = [];
+        words.clear();
         for (let i = 0, l = word.length; i <= l; i++) {
             if (!words.has(word)) {
                 addToTrie(word);
@@ -187,6 +187,7 @@ const controls = document.getElementById('control');
 addBtn.addEventListener('click', addCurrentInput);
 clearBtn.addEventListener('click', () => {
     trie.children = [];
+    words.clear();
     updateDisplay();
 });
 // refreshBtn.addEventListener('click', updateDisplay);
@@ -216,3 +217,8 @@ showEndCheck.addEventListener('change', (event) => {
 hideBtn.addEventListener('click', () => {
     controls.hidden = !controls.hidden;
 });
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    updateDisplay();
+}
