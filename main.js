@@ -1,7 +1,9 @@
 const inputText = document.getElementById('input');
-const PADDING = 10;
-const VGAP = 30;
-const NODE_DIAMETER = 20;
+let PADDING = 10;
+let VGAP = 30;
+let NODE_DIAMETER = 20;
+let suffixMode = false;
+let showEnd = true;
 
 let words = new Set();
 
@@ -48,36 +50,53 @@ function updateSize(node) {
         return node.size;
     }
     let size = -PADDING;
-    for (let i = 0; i < node.children.length; i++) {
-        size += updateSize(node.children[i]) + PADDING;
+    for (const child of node.children) {
+        if (!showEnd && child.children.length == 0) {
+            continue;
+        }
+        size += updateSize(child) + PADDING;
     }
     node.size = size;
     return size;
 }
 
-function updateDisplay(node, x, y) {
+function drawTrie(node, x, y) {
     if (node.children.length == 0) {
         drawNode(node, x, y);
         return;
     }
     if (node.children.length == 1) {
-        line(x, y, x, y + VGAP);
-        updateDisplay(node.children[0], x, y + VGAP);
+        if (showEnd || node.children[0].children.length != 0) {
+            line(x, y, x, y + VGAP);
+            drawTrie(node.children[0], x, y + VGAP);
+        }
         drawNode(node, x, y);
         return; 
     }
     let childrenSizeSum = -PADDING;
     for (const child of node.children) {
+        if (!showEnd && child.children.length == 0) {
+            continue;
+        }
         childrenSizeSum += child.size + PADDING;
     }
     let xacc = x - childrenSizeSum/2;
     for (const child of node.children) {
+        if (!showEnd && child.children.length == 0) {
+            continue;
+        }
         xacc += child.size/2;
         line(x, y, xacc, y + VGAP);
-        updateDisplay(child, xacc, y + VGAP);
+        drawTrie(child, xacc, y + VGAP);
         xacc += child.size/2 + PADDING;
     }
     drawNode(node, x, y);
+}
+
+function updateDisplay() {
+    background(0);
+    updateSize(trie);
+    drawTrie(trie, width/2, NODE_DIAMETER/2 + 10);
 }
 
 function addToTrie(word) {
@@ -115,28 +134,85 @@ function addToTrie(word) {
 // });
 
 function setup() {
-    createCanvas(500,500);
+    createCanvas(windowWidth, windowHeight);
     stroke(255);
     fill(255);
     textSize(17);
     textAlign(CENTER, CENTER);
-    background(0);
+    updateDisplay();
+}
+
+function addCurrentInput() {
+    let word = inputText.value;
+    if (suffixMode) {
+        words.clear();
+        trie.children = [];
+        for (let i = 0, l = word.length; i <= l; i++) {
+            if (!words.has(word)) {
+                addToTrie(word);
+            }
+            words.add(word);
+            word = word.substring(1);
+        }
+    } else {
+        if (!words.has(word)) {
+            addToTrie(word);
+        }
+        words.add(word);
+    }
+    inputText.value = '';
+    updateDisplay();
 }
 
 function keyPressed() {
     if (keyCode != 13) {
         return;
     }
-    let word = inputText.value;
-    if (word == '') {
-        return;
-    }
-    if (!words.has(word)) {
-        addToTrie(word);
-    }
-    words.add(word);
-    inputText.value = '';
-    background(0);
-    updateSize(trie);
-    updateDisplay(trie, width/2, VGAP);
+    addCurrentInput();
 }
+
+const suffixModeCheck = document.getElementById('suffixmode');
+const showEndCheck = document.getElementById('showend');
+
+const node_size = document.getElementById('node_size');
+const hgap = document.getElementById('hgap');
+const vgap = document.getElementById('vgap');
+
+const addBtn = document.getElementById('addBtn');
+const clearBtn = document.getElementById('clearBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const hideBtn = document.getElementById('hideControls');
+const controls = document.getElementById('control');
+
+addBtn.addEventListener('click', addCurrentInput);
+clearBtn.addEventListener('click', () => {
+    trie.children = [];
+    updateDisplay();
+});
+// refreshBtn.addEventListener('click', updateDisplay);
+
+
+suffixModeCheck.addEventListener('change', (event) => {
+    suffixMode = event.target.checked;
+});
+
+node_size.addEventListener('change', (event) => {
+    NODE_DIAMETER = parseInt(event.target.value);
+    updateDisplay();
+});
+hgap.addEventListener('change', (event) => {
+    PADDING = parseInt(event.target.value);
+    updateDisplay();
+});
+vgap.addEventListener('change', (event) => {
+    VGAP = parseInt(event.target.value);
+    updateDisplay();
+});
+showEndCheck.addEventListener('change', (event) => {
+    showEnd = event.target.checked;
+    updateDisplay();
+});
+
+hideBtn.addEventListener('click', () => {
+    controls.hidden = !controls.hidden;
+});

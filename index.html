@@ -3,10 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Trie Visualizer</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <input type="text" id="input">
+    Trie Visualizer // <button id="hideControls">Toggle Hide Controls</button>
+    <div id="control">
+        <h1>Trie Visualizer</h1>
+        <div id="main-control">
+            <input type="text" id="input">
+            <button id="addBtn">Add</button>
+            <button id="clearBtn">Clear All</button>
+        </div>
+        <h4>Options</h4>
+        <div id="options">
+            <input type="checkbox" id="suffixmode" name="suffixmode">
+            <label for="suffixmode">Suffix Mode (clears current input)</label>
+            <br>
+            <label for="node_size">Node diameter: </label>
+            <input type="number" name="node_size" id="node_size" min="20" max="100" value="20">
+            <br>
+            <label for="hgap">Horizontal Gap: </label>
+            <input type="number" name="hgap" id="hgap" min="0" max="100" value="10">
+            <br>
+            <label for="vgap">Vertical Gap: </label>
+            <input type="number" name="vgap" id="vgap" min="0" max="100" value="30">
+            <br>
+            <input type="checkbox" checked id="showend" name="showend">
+            <label for="showend">Show terminating symbol</label>
+        </div>
+    </div>
+    <br>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js" integrity="sha512-eu9vkh+EbAsW3fMmPTj/DP5W3UegIdu0Z/OABMocvoofx43MYBkcQ9hRIVxZndV1vcCYQwBg+U1PkWl04TD0Jg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="main.js"></script>
 </body>
